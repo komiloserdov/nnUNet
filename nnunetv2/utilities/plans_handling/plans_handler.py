@@ -54,40 +54,76 @@ class ConfigurationManager(object):
             conv_op = convert_dim_to_conv_op(dim)
             instnorm = get_matching_instancenorm(dimension=dim)
 
-            arch_dict = {
-                'network_class_name': network_class_name,
-                'arch_kwargs': {
-                    "n_stages": n_stages,
-                    "features_per_stage": [min(self.configuration["UNet_base_num_features"] * 2 ** i,
-                                               self.configuration["unet_max_num_features"])
-                                           for i in range(n_stages)],
-                    "conv_op": conv_op.__module__ + '.' + conv_op.__name__,
-                    "kernel_sizes": deepcopy(self.configuration["conv_kernel_sizes"]),
-                    "strides": deepcopy(self.configuration["pool_op_kernel_sizes"]),
-                    "n_conv_per_stage": deepcopy(self.configuration["n_conv_per_stage_encoder"]),
-                    "n_conv_per_stage_decoder": deepcopy(self.configuration["n_conv_per_stage_decoder"]),
-                    "conv_bias": True,
-                    "norm_op": instnorm.__module__ + '.' + instnorm.__name__,
-                    "norm_op_kwargs": {
-                        "eps": 1e-05,
-                        "affine": True
+            if unet_class_name == "PlainConvUNet":
+                arch_dict = {
+                    'network_class_name': network_class_name,
+                    'arch_kwargs': {
+                        "n_stages": n_stages,
+                        "features_per_stage": [min(self.configuration["UNet_base_num_features"] * 2 ** i,
+                                                self.configuration["unet_max_num_features"])
+                                            for i in range(n_stages)],
+                        "conv_op": conv_op.__module__ + '.' + conv_op.__name__,
+                        "kernel_sizes": deepcopy(self.configuration["conv_kernel_sizes"]),
+                        "strides": deepcopy(self.configuration["pool_op_kernel_sizes"]),
+                        "n_conv_per_stage": deepcopy(self.configuration["n_conv_per_stage_encoder"]),
+                        "n_conv_per_stage_decoder": deepcopy(self.configuration["n_conv_per_stage_decoder"]),
+                        "conv_bias": True,
+                        "norm_op": instnorm.__module__ + '.' + instnorm.__name__,
+                        "norm_op_kwargs": {
+                            "eps": 1e-05,
+                            "affine": True
+                        },
+                        "dropout_op": None,
+                        "dropout_op_kwargs": None,
+                        "nonlin": "torch.nn.LeakyReLU",
+                        "nonlin_kwargs": {
+                            "inplace": True
+                        }
                     },
-                    "dropout_op": None,
-                    "dropout_op_kwargs": None,
-                    "nonlin": "torch.nn.LeakyReLU",
-                    "nonlin_kwargs": {
-                        "inplace": True
-                    }
-                },
-                # these need to be imported with locate in order to use them:
-                # `conv_op = pydoc.locate(architecture_kwargs['conv_op'])`
-                "_kw_requires_import": [
-                    "conv_op",
-                    "norm_op",
-                    "dropout_op",
-                    "nonlin"
-                ]
-            }
+                    # these need to be imported with locate in order to use them:
+                    # `conv_op = pydoc.locate(architecture_kwargs['conv_op'])`
+                    "_kw_requires_import": [
+                        "conv_op",
+                        "norm_op",
+                        "dropout_op",
+                        "nonlin"
+                    ]
+                }
+            elif unet_class_name == 'ResidualEncoderUNet':
+                arch_dict = {
+                    'network_class_name': network_class_name,
+                    'arch_kwargs': {
+                        "n_stages": n_stages,
+                        "features_per_stage": [min(self.configuration["UNet_base_num_features"] * 2 ** i,
+                                                self.configuration["unet_max_num_features"])
+                                            for i in range(n_stages)],
+                        "conv_op": conv_op.__module__ + '.' + conv_op.__name__,
+                        "kernel_sizes": deepcopy(self.configuration["conv_kernel_sizes"]),
+                        "strides": deepcopy(self.configuration["pool_op_kernel_sizes"]),
+                        "n_blocks_per_stage": deepcopy(self.configuration["n_conv_per_stage_encoder"]),
+                        "n_conv_per_stage_decoder": deepcopy(self.configuration["n_conv_per_stage_decoder"]),
+                        "conv_bias": True,
+                        "norm_op": instnorm.__module__ + '.' + instnorm.__name__,
+                        "norm_op_kwargs": {
+                            "eps": 1e-05,
+                            "affine": True
+                        },
+                        "dropout_op": None,
+                        "dropout_op_kwargs": None,
+                        "nonlin": "torch.nn.LeakyReLU",
+                        "nonlin_kwargs": {
+                            "inplace": True
+                        }
+                    },
+                    # these need to be imported with locate in order to use them:
+                    # `conv_op = pydoc.locate(architecture_kwargs['conv_op'])`
+                    "_kw_requires_import": [
+                        "conv_op",
+                        "norm_op",
+                        "dropout_op",
+                        "nonlin"
+                    ]
+                }
             del self.configuration["UNet_class_name"], self.configuration["UNet_base_num_features"], \
                 self.configuration["n_conv_per_stage_encoder"], self.configuration["n_conv_per_stage_decoder"], \
                 self.configuration["num_pool_per_axis"], self.configuration["pool_op_kernel_sizes"],\
