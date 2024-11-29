@@ -98,6 +98,34 @@ class ConfigurationManager(object):
 
     def __repr__(self):
         return self.configuration.__repr__()
+    
+    @property
+    def alpha(self) -> float:
+        return self.plans['alpha'] if 'alpha' in self.configuration.keys() else None
+    
+    @property
+    def beta(self) -> float:
+        return self.plans['beta'] if 'beta' in self.configuration.keys() else None
+    
+    @property
+    def gamma(self) -> float:
+        return self.plans['gamma'] if 'gamma' in self.configuration.keys() else None
+    
+    @property
+    def delta(self) -> float:
+        return self.plans['delta'] if 'delta' in self.configuration.keys() else None
+    
+    @property
+    def weight_loss_1(self) -> float:
+        return self.plans['weight_loss_1'] if 'weight_loss_1' in self.configuration.keys() else 1
+    
+    @property
+    def weight_loss_2(self) -> float:
+        return self.plans['weight_loss_2'] if 'weight_loss_2' in self.configuration.keys() else 1
+    
+    @property
+    def weight_loss_3(self) -> float:
+        return self.plans['weight_loss_3'] if 'weight_loss_3' in self.configuration.keys() else 1
 
     @property
     def data_identifier(self) -> str:
